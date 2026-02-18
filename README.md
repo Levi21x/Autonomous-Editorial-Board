@@ -1,10 +1,23 @@
-The Autonomous Editorial Board
-===============================
+# The Autonomous Editorial Board
 
-Quick start
------------
+Autonomous Editorial Board is a 4-agent, production-oriented content pipeline that
+mimics a publishing house: research, writing, SEO optimization, and final editorial
+polish are handled by specialized agents. The system integrates live web
+research via Tavily, Groq (LLM) for writing, and CrewAI for orchestration. A
+Streamlit UI provides a simple front-end for generating production-ready Markdown
+articles.
 
-- Create a virtualenv and install dependencies:
+## Features
+
+- Lead Researcher: live web fact-gathering (Tavily) and source collection.
+- Senior Writer: narrative drafting and tone control using the LLM.
+- SEO Strategist: keyword recommendations, meta description, and header structure.
+- Editor-in-Chief: merges outputs into a production-ready Markdown article.
+- Streamlit app: UI for topic input, progress monitoring, and article preview/download.
+
+## Quick start
+
+1. Create a virtual environment and install dependencies:
 
 ```powershell
 C:/path/to/python -m venv venv
@@ -12,39 +25,58 @@ venv\Scripts\activate
 venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-- Populate `.env` from `.env.example` (do not commit secrets):
+2. Populate secrets (do not commit `.env`):
 
 ```powershell
 copy .env.example .env
-# then edit .env to add your keys, or export them into the session:
+# edit .env and provide your keys, or set them in the environment:
 $env:GROQ_API_KEY = 'your_groq_api_key'
 $env:TAVILY_API_KEY = 'your_tavily_api_key'
 ```
 
-- Run the pipeline interactively:
+3. Run the Streamlit app (recommended):
 
 ```powershell
-C:/Users/harsh/multi-agent-newsroom/venv/Scripts/python.exe src/newsroom/main.py
+C:/Users/harsh/multi-agent-newsroom/venv/Scripts/python.exe -m streamlit run app.py
 ```
 
-Or pipe a single-line topic:
+4. Or run the CLI pipeline directly:
 
 ```powershell
-echo "The future of AI in journalism" | C:/Users/harsh/multi-agent-newsroom/venv/Scripts/python.exe src/newsroom/main.py
+C:/Users/harsh/multi-agent-newsroom/venv/Scripts\python.exe src/newsroom/main.py
+# or
+echo "Topic here" | C:/Users/harsh/multi-agent-newsroom/venv/Scripts/python.exe src/newsroom/main.py
 ```
 
-What I changed to improve the project
-------------------------------------
-- Removed stored API keys from `.env` (they were present). Please rotate the exposed keys immediately.
-- Added this README with run/security notes.
-- Improved the mock fallback to produce richer, deterministic test output so you can validate the pipeline without live LLM access.
+## Configuration
 
-Security note
--------------
-If you previously pasted real API keys into this project, rotate them now at the provider dashboard. Never commit `.env` to version control. Use secrets managers for production.
+- `.env` values (see `.env.example`): `GROQ_API_KEY`, `TAVILY_API_KEY`, `MODEL_NAME`, `OUTPUT_DIR`.
+- Output Markdown files are written to the `output/` folder by default.
 
-Next steps I can take
----------------------
-- Help debug the Groq/crewai client error for live LLM runs.
-- Add unit tests and CI config to validate the pipeline on each change.
-- Replace the mock fallback with a local small model runner for offline generation.
+## Security
+
+- Never commit secrets. If you accidentally add API keys here, rotate them immediately.
+- For production, use a secrets manager (GitHub Secrets, AWS Secrets Manager, etc.).
+
+## Development notes
+
+- The repo contains modular code under `src/newsroom/`:
+  - `agents.py` — agent personalities and LLM/tool wiring
+  - `tasks.py` — task definitions and expected deliverables
+  - `main.py` — orchestration/engine and file saving
+- `app.py` at project root launches the Streamlit UI.
+- `requirements.txt` lists runtime dependencies.
+
+## CI / Next steps
+
+- Add a GitHub Actions workflow to run tests and linting on PRs.
+- Add unit/integration tests that validate the pipeline (mock external calls).
+- Optionally wire a small local LLM for offline generation in CI or development.
+
+## License & Attribution
+
+This repository is a starter scaffold — adapt licenses and attribution as
+appropriate for your project and dependencies.
+
+If you want, I can also add a basic GitHub Actions CI workflow and example tests.
+Just tell me which CI checks you prefer.
